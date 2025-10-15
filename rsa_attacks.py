@@ -57,9 +57,9 @@ def bleichenbacher_recover_plaintext(ct0: bytes, n: int, e: int,
     raise NotImplementedError(" yet to implement")
 
 
-# -------------------------
-# CRT FAULT INJECTION STUBS
-# -------------------------
+# --------------------
+# CRT FAULT INJECTION 
+# --------------------
 def crt_decrypt(c: int, p: int, q: int, d: int, n: int) -> Tuple[int, Tuple[int, int]]:
     """
     Return (m, (m1, m2)) computed via CRT.
@@ -81,6 +81,7 @@ def recover_factor_from_fault(m_correct: int, m_fault: int, n: int) -> int:
     Compute gcd(n, m_correct - m_fault) to attempt to recover p or q.
     """
     raise NotImplementedError
+
 
 
 
