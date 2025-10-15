@@ -34,11 +34,9 @@ n bits: 1024
 cipher len: 128
 plaintext recovered (right-aligned): True
 
-### 2. rsa_attacks.py
+### 2. 'rsa_attacks.py'
 
 This file defines method stubs and pseudocode for the main attack experiments that will be developed next.
-
-Implemented:
 
 Function structure and signatures for:
 
@@ -57,6 +55,7 @@ Modular structure to integrate later with rsa.py key generation and encrypt/decr
 Purpose:
 
 rsa_attacks.py acts as the project skeleton for the attack phase, showing exactly how Bleichenbacher and CRT attacks will be coded and tested in the final deliverable.
+
 rsa_attacks.py is not yet executable — it contains pseudocode and function skeletons for the final submission.
 
 
