@@ -14,7 +14,7 @@ IMPORTANT:
     insecure in real-world deployments. We intentionally omit padding
     because the project demonstrates padding oracle attacks separately.
 
-Author: Sankalp Dasari, Aryan Shiva, Ishaan Jain, Sophia Chukka
+Authors: Sankalp Dasari, Aryan Shiva, Ishaan Jain, Sophia Chukka
 """
 from secrets import randbits
 
@@ -36,7 +36,7 @@ def gcd(a, b) -> int:
     
      while b:
         a, b = b, a % b
-        return abs(a)
+     return abs(a)
 
 """
 Extended Euclidean Algorithm.
