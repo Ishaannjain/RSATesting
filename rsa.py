@@ -304,4 +304,4 @@ if __name__ == "__main__":
 
     print("n bits:", n.bit_length())
     print("cipher len:", len(ct))
-    print("plaintext recovered (right-aligned):", pt_block.endswith(msg))
+    print("plaintext recovered:", pt_block.endswith(msg))

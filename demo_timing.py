@@ -51,7 +51,7 @@ def main():
 
     # Example: recover last 6 bits of d
     bits_to_recover = 6
-    real_bits = bin(d)[-bits_to_recover:]
+    real_bits = bin(d)[-bits_to_recover:][::-1]
     guessed_bits = ""
 
     print("\n Attempting to recover last 6 bits of d:")
