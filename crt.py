@@ -1,5 +1,5 @@
 """
-demo_crt_fault.py
+crt.py
 -----------------
 
 Demonstration of the Bellcore/Lenstra RSA CRT fault attack.

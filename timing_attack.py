@@ -1,5 +1,5 @@
 """
-demo_timing.py
+timing_attack.py
 --------------
 
 Demonstration of a timing side-channel attack
