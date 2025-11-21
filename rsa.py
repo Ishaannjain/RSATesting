@@ -9,10 +9,10 @@ This file Contains:
     - Raw textbook RSA encryption and decryption (no padding)
 
 IMPORTANT:
-    This is a *secure* reference implementation Of Textbook RSA
-    but does NOT include padding (e.g., PKCS#1). Raw textbook RSA is
-    insecure in real-world deployments. We intentionally omit padding
-    because the project demonstrates padding oracle attacks separately.
+    This is an implementation Of Textbook RSA and but does NOT include 
+    padding (e.g., PKCS#1). Raw textbook RSA is insecure in real-world 
+    deployments. We intentionally omit padding because the project 
+    demonstrates padding oracle attacks separately.
 
 Authors: Sankalp Dasari, Aryan Shiva, Ishaan Jain, Sophia Chukka
 """

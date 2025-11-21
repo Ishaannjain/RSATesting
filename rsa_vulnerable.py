@@ -1,21 +1,14 @@
 """
-rsa_vulnerable.py
------------------
-
 INTENTIONALLY VULNERABLE RSA IMPLEMENTATIONS
 ============================================
-This file contains *insecure versions* of RSA operations that the attacks
+This file contains a vulnerable version of RSA operations that the attacks
 (Bleichenbacher padding oracle, timing attack, and CRT fault attack)
 will exploit.
-
-This implementation does NOT aim to be secure, it is DESIGNED to leak information.
 
 Features:
     PKCS#1 v1.5 padding oracle (True/False leak)
     Non-constant-time RSA decryption (timing varies with key bits)
     CRT RSA decryption
-
-These are the "attacked services" for your demonstrators.
 
 Authors: Sankalp Dasari, Aryan Shiva, Ishaan Jain, Sophia Chukka
 """

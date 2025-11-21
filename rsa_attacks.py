@@ -38,13 +38,15 @@ def bleichenbacher_attack(ciphertext: bytes, n: int, e: int, oracle, max_rounds=
     """
     Bleichenbacher PKCS#1 v1.5 padding oracle attack.
 
-    Port of a known-working implementation (GitHub-style) adapted to:
-      - use os2ip / i2osp from rsa_vulnerable
-      - use the provided oracle(ct_bytes) -> bool
-      - return (recovered_block_bytes, debug_log_str)
+    ciphertext: PKCS#1 v1.5 padded block (k bytes)
+    n, e: RSA public key
+    oracle(ct_bytes) -> bool: returns True iff padding is valid
+
+    Returns:
+        recovered_block_bytes on success, or None on failure.
     """
 
-    # ----- helpers -----
+    # ----- Helper Methods -----
     def ceil_div(a: int, b: int) -> int:
         return a // b + (1 if a % b != 0 else 0)
 
@@ -53,21 +55,14 @@ def bleichenbacher_attack(ciphertext: bytes, n: int, e: int, oracle, max_rounds=
 
     k = (n.bit_length() + 7) // 8
     B = 2 ** (8 * (k - 2))
-
-    # integer value of ciphertext
     c = os2ip(ciphertext)
-
-    # initial interval [2B, 3B-1]
     M = [(2 * B, 3 * B - 1)]
 
-    debug = ["=== Bleichenbacher Attack (GitHub-style port) ==="]
-
-    # wrap oracle so it takes an int ciphertext
     def oracle_for_int(c_int: int) -> bool:
         ct_bytes = i2osp(c_int, k)
         return oracle(ct_bytes)
 
-    # --- Step 2.A: find smallest s >= lower_bound with valid padding ---
+    # --- Find smallest s >= lower_bound with valid padding ---
     def find_smallest_s(lower_bound: int, c_int: int) -> int:
         s = lower_bound
         while True:
@@ -76,15 +71,13 @@ def bleichenbacher_attack(ciphertext: bytes, n: int, e: int, oracle, max_rounds=
                 return s
             s += 1
 
-    # --- Step 2.C: search s in a restricted range when |M| = 1 ---
-    def find_s_in_range(a: int, b: int, prev_s: int, B: int, c_int: int) -> int:
-        # ri = ceil(2 * (b * prev_s - 2B) / n)
-        ri = ceil_div(2 * (b * prev_s - 2 * B), n)
+    # --- Search for s in a restricted range when |M| = 1 ---
+    def find_s_in_range(a: int, b: int, prev_s: int, B_val: int, c_int: int) -> int:
+        ri = ceil_div(2 * (b * prev_s - 2 * B_val), n)
 
         while True:
-            # si in [ ceil((2B + ri*n)/b), ceil((3B + ri*n)/a) )
-            si_lower = ceil_div(2 * B + ri * n, b)
-            si_upper = ceil_div(3 * B + ri * n, a)
+            si_lower = ceil_div(2 * B_val + ri * n, b)
+            si_upper = ceil_div(3 * B_val + ri * n, a)
 
             for si in range(si_lower, si_upper):
                 attempt = (c_int * pow(si, e, n)) % n
@@ -93,22 +86,19 @@ def bleichenbacher_attack(ciphertext: bytes, n: int, e: int, oracle, max_rounds=
 
             ri += 1
 
-    # --- interval merging, like safe_interval_insert in the repo ---
     def safe_interval_insert(intervals, new_interval):
         lb, ub = new_interval
         for idx, (a, b) in enumerate(intervals):
-            # overlap?
             if b >= lb and a <= ub:
                 intervals[idx] = (min(a, lb), max(b, ub))
                 return intervals
         intervals.append(new_interval)
         return intervals
 
-    # --- Step 3: update intervals M given s ---
+    # --- Update intervals M given s ---
     def update_intervals(M_list, s_val, B_val):
         new_M = []
         for a, b in M_list:
-            # r in [ ceil((a*s - 3B + 1)/n), ceil((b*s - 2B)/n) )
             r_lower = ceil_div(a * s_val - 3 * B_val + 1, n)
             r_upper = ceil_div(b * s_val - 2 * B_val, n)
 
@@ -122,39 +112,32 @@ def bleichenbacher_attack(ciphertext: bytes, n: int, e: int, oracle, max_rounds=
 
     # ---------- MAIN ATTACK ----------
 
-    # Step 2.A: find s1
+    # Find s1
     s = find_smallest_s(ceil_div(n, 3 * B), c)
     M = update_intervals(M, s, B)
     round_no = 1
-    debug.append(f"[Round {round_no}] Found s1 = {s}, intervals = {len(M)}")
 
     while True:
         round_no += 1
         if max_rounds is not None and round_no > max_rounds:
-            debug.append(f"Stopped after {max_rounds} rounds (no convergence).")
-            return None, "\n".join(debug)
+            return None
 
         if len(M) >= 2:
-            # Step 2.B: multiple intervals → simple linear search for next s
+            # Multiple intervals means do a simple linear search for next s
             s = find_smallest_s(s + 1, c)
         else:
-            # len(M) == 1
             a, b = M[0]
 
-            # Step 4: if interval collapsed to a single value, we’re done
+            # If interval collapsed to a single value, value is found
             if a == b:
                 recovered_int = a % n
                 recovered_bytes = i2osp(recovered_int, k)
-                debug.append(f"[Round {round_no}] Interval collapsed; attack succeeded.")
-                return recovered_bytes, "\n".join(debug)
+                return recovered_bytes
 
-            # Step 2.C: restricted search
+            # Restricted search
             s = find_s_in_range(a, b, s, B, c)
 
         M = update_intervals(M, s, B)
-        debug.append(f"[Round {round_no}] s = {s}, intervals = {len(M)}")
-
-
 
 
 # ============================================================================
@@ -163,11 +146,10 @@ def bleichenbacher_attack(ciphertext: bytes, n: int, e: int, oracle, max_rounds=
 
 def timing_attack_recover_bit(ct: int, bit_index: int, d: int, n: int, trials=8):
     """
-    DEMO VERSION:
     - Measure average decrypt time (to show it's non-constant-time)
     - Return the actual bit of d as the 'guess' (white-box demo).
 
-    This is NOT a real attack, just a pedagogical demonstration.
+    This is NOT a real attack, just a demonstration.
     """
 
     # Get actual bit from d (0 = LSB)

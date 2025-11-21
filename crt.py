@@ -1,7 +1,4 @@
 """
-crt.py
------------------
-
 Demonstration of the Bellcore/Lenstra RSA CRT fault attack.
 
 The CRT optimization of RSA performs:
