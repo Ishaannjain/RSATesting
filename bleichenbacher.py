@@ -19,11 +19,6 @@ from rsa import gen_rsa, os2ip, i2osp
 from rsa_vulnerable import pkcs1_pad, padding_oracle
 from rsa_attacks import bleichenbacher_attack
 
-
-from rsa import gen_rsa, os2ip, i2osp
-from rsa_vulnerable import pkcs1_pad, padding_oracle
-from rsa_attacks import bleichenbacher_attack
-
 def main():
     print("BLEICHENBACHER ATTACK\n")
 
@@ -38,24 +33,19 @@ def main():
     message = b"Cryptography II"
     print(f"[*] Original message: {message}\n")
 
-    # 3. PKCS1 padding
-    padded = pkcs1_pad(message, k, n)  # new version
-    m = os2ip(padded)
-    c = pow(m, e, n)
-    ciphertext = i2osp(c, k)
-
-    # 4. Encrypt
+    # 3. PKCS1 padding and Encryption
+    padded = pkcs1_pad(message, k, n)
     m = os2ip(padded)
     c = pow(m, e, n)
     ct = i2osp(c, k)
     print("[*] Ciphertext generated.")
 
-    # 5. Run the optimized attack
-    print("[*] Running optimized Bleichenbacher attack...\n")
+    # 4. Run the attack
+    print("[*] Running Bleichenbacher attack...\n")
     recovered_block, logs = bleichenbacher_attack(
         ct, n, e,
         oracle=lambda ct: padding_oracle(ct, n, d),
-        max_rounds=200
+        max_rounds=400  # large numbr of rounds to support RSA-256
     )
 
     if recovered_block is None:
